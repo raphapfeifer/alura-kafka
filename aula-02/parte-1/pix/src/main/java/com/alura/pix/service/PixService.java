@@ -2,6 +2,7 @@ package com.alura.pix.service;
 
 import com.alura.pix.dto.PixDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -9,10 +10,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PixService {
 
+
+    @Autowired
     private final KafkaTemplate<String, PixDTO>  kafkaTemplate;
 
     public PixDTO salvarPix(PixDTO pixDTO) {
-        kafkaTemplate.send("pix-topic", pixDTO);
+        kafkaTemplate.send("pix-topic",pixDTO);
         return pixDTO;
     }
 
