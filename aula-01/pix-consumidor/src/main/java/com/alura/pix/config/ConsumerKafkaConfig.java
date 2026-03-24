@@ -1,6 +1,7 @@
 package com.alura.pix.config;
 
 import com.alura.pix.dto.PixDTO;
+import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -13,11 +14,24 @@ import org.springframework.kafka.core.*;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
+
 import java.util.HashMap;
 import java.util.Map;
 
+
+
 @Configuration
+//@EnableKafkaStreams
 public class ConsumerKafkaConfig {
+
+    /*@Bean(name = KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)
+    public KafkaStreamsConfiguration kafkaStreamsConfig(){
+        Map props = new HashMap<>();
+        props.put(APPLICATION_ID_CONFIG, "kafka-stream-demo-6");
+
+        return new KafkaStreamsConfiguration(props);
+        return null;
+    }*/
 
     @Value(value = "${spring.kafka.bootstrap-servers:localhost:9092}")
     private String bootstrapAddress;
@@ -54,10 +68,29 @@ public class ConsumerKafkaConfig {
                 StringDeserializer.class);
         props.put(
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-                JsonDeserializer.class);
+                KafkaAvroSerializer.class);
+        props.put(
+                "schema.registry.url",
+                "http://localhost:8081");
         props.put(
                 JsonDeserializer.TRUSTED_PACKAGES,
                 "*");
+
+        props.put(
+                ConsumerConfig.MAX_POLL_RECORDS_CONFIG,10);
+
+        props.put(
+                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest"
+        );
+
+        props.put(
+                ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG, false
+        );
+
+        props.put(
+                ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false
+        );
+
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
